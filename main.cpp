@@ -1,4 +1,5 @@
 #include <wx/dir.h>
+#include <wx/notebook.h>
 #include <wx/filename.h>
 #include <wx/regex.h>
 #include <wx/thread.h>
@@ -154,40 +155,45 @@ MyFrame::MyFrame(const wxString& title)
   helpMenu->Append(wxID_ABOUT); // пункт "О программе"
 
   wxMenuBar* menuBar = new wxMenuBar;
-  menuBar->Append(menuFile, "&File");
-  menuBar->Append(helpMenu, "&About");
+  // menuBar->Append(menuFile, "&File");
+  
+  menuBar->Append(helpMenu, "&Help");
+  helpMenu->Append(wxID_ABOUT, "&About\tF1");
   SetMenuBar(menuBar);
 
-  // --- Основная панель и разметка ---
-  wxPanel* panel = new wxPanel(this, wxID_ANY);
+  // --- Notebook с вкладками ---
+  wxNotebook* notebook = new wxNotebook(this, wxID_ANY);
+
+  // --- Вкладка Flash ---
+  wxPanel* flashPanel = new wxPanel(notebook, wxID_ANY);
   wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL); // вертикальный контейнер
 
   // --- Элементы для выбора файла ---
-  wxButton* btnOpenFile = new wxButton(panel, 1, "Выбрать файл");
-  m_filePathText = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition,
+  wxButton* btnOpenFile = new wxButton(flashPanel, 1, "Выбрать файл");
+  m_filePathText = new wxTextCtrl(flashPanel, wxID_ANY, "", wxDefaultPosition,
                                   wxDefaultSize, wxTE_READONLY);
   m_fileSizeText =
-      new wxTextCtrl(panel, wxID_ANY, "Размер файла: -", wxDefaultPosition,
+      new wxTextCtrl(flashPanel, wxID_ANY, "Размер файла: -", wxDefaultPosition,
                      wxDefaultSize, wxTE_READONLY);
 
   // --- Элементы для выбора диска ---
-  wxButton* btnSelectDisk = new wxButton(panel, 2, "Выбрать диск");
-  m_diskPathText = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition,
+  wxButton* btnSelectDisk = new wxButton(flashPanel, 2, "Выбрать диск");
+  m_diskPathText = new wxTextCtrl(flashPanel, wxID_ANY, "", wxDefaultPosition,
                                   wxDefaultSize, wxTE_READONLY);
   m_diskSizeText =
-      new wxTextCtrl(panel, wxID_ANY, "Размер диска: -", wxDefaultPosition,
+      new wxTextCtrl(flashPanel, wxID_ANY, "Размер диска: -", wxDefaultPosition,
                      wxDefaultSize, wxTE_READONLY);
 
   // --- Индикатор прогресса ---
   m_progressBar =
-      new wxGauge(panel, wxID_ANY, 100, wxDefaultPosition, wxSize(-1, 25));
-  wxButton* btnStartWrite = new wxButton(panel, 3, "Записать файл на диск");
+      new wxGauge(flashPanel, wxID_ANY, 100, wxDefaultPosition, wxSize(-1, 25));
+  wxButton* btnStartWrite = new wxButton(flashPanel, 3, "Записать файл на диск");
 
   // --- Окно логов ---
-  m_logWindow = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition,
+  m_logWindow = new wxTextCtrl(flashPanel, wxID_ANY, "", wxDefaultPosition,
                                wxSize(-1, 200), wxTE_MULTILINE | wxTE_READONLY);
 
-  // --- Добавление элементов в layout ---
+  // --- Добавление элементов во вкладку Flash ---
   vbox->Add(btnOpenFile, 0, wxEXPAND | wxALL, 5);
   vbox->Add(m_filePathText, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
   vbox->Add(m_fileSizeText, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 5);
@@ -198,11 +204,30 @@ MyFrame::MyFrame(const wxString& title)
 
   vbox->Add(m_progressBar, 0, wxEXPAND | wxALL, 5);
   vbox->Add(btnStartWrite, 0, wxEXPAND | wxALL, 5);
-  vbox->Add(new wxStaticText(panel, wxID_ANY, "Лог выполнения:"), 0,
+  vbox->Add(new wxStaticText(flashPanel, wxID_ANY, "Лог выполнения:"), 0,
             wxLEFT | wxTOP, 5);
   vbox->Add(m_logWindow, 1, wxEXPAND | wxALL, 5);
 
-  panel->SetSizer(vbox);
+  flashPanel->SetSizer(vbox);
+
+  // --- Вкладка Backup ---
+  wxPanel* backupPanel = new wxPanel(notebook, wxID_ANY);
+  wxBoxSizer* bSizer = new wxBoxSizer(wxVERTICAL);
+  bSizer->Add(new wxStaticText(backupPanel, wxID_ANY, "Soon"),
+              1, wxALIGN_CENTER | wxALL, 20);
+  backupPanel->SetSizer(bSizer);
+
+  // --- Вкладка Format ---
+  wxPanel* formatPanel = new wxPanel(notebook, wxID_ANY);
+  wxBoxSizer* fSizer = new wxBoxSizer(wxVERTICAL);
+  fSizer->Add(new wxStaticText(formatPanel, wxID_ANY, "Soon"),
+              1, wxALIGN_CENTER | wxALL, 20);
+  formatPanel->SetSizer(fSizer);
+
+  // --- Добавление вкладок в notebook ---
+  notebook->AddPage(flashPanel, "Flash", true);
+  notebook->AddPage(backupPanel, "Backup");
+  notebook->AddPage(formatPanel, "Format");
 
   // --- Привязка событий ---
   Bind(wxEVT_MENU, &MyFrame::OnAbout, this, wxID_ABOUT);
@@ -212,6 +237,7 @@ MyFrame::MyFrame(const wxString& title)
   Bind(wxEVT_BUTTON, &MyFrame::OnStartWrite, this, 3);
   Bind(wxEVT_THREAD_UPDATE, &MyFrame::OnUpdate, this);
 }
+
 
 // --- Обработчики событий ---
 void MyFrame::OnExit(wxCommandEvent&) { Close(true); }
