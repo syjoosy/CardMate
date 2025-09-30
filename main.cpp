@@ -1,12 +1,15 @@
 #include <wx/dir.h>
+#include <wx/stdpaths.h>
 #include <wx/notebook.h>
 #include <wx/filename.h>
 #include <wx/regex.h>
 #include <wx/thread.h>
 #include <wx/wx.h>
-
+#include <wx/clipbrd.h>
+#include <wx/artprov.h>
 #include <fstream>
 #include <iostream>
+#include <unistd.h>
 
 #define VERSION "v0.1 Dev Build"
 
@@ -26,7 +29,7 @@ class FlashThread : public wxThread {
         m_dstFile(dstFile) {}
 
  protected:
-  // Основная функция потока (Entry) — выполняет запись
+// Основная функция потока (Entry) — выполняет запись
   virtual ExitCode Entry() override {
     const size_t buf_size = 4 * 1024 * 1024;  // размер буфера = 4 МБ
     char* buffer = new char[buf_size];        // выделяем буфер под данные
@@ -104,6 +107,58 @@ class FlashThread : public wxThread {
   }
 };
 
+class RootDialog : public wxDialog {
+public:
+    RootDialog(wxWindow* parent, const wxString& cmd)
+        : wxDialog(parent, wxID_ANY, "Error: Administrator rights are required", wxDefaultPosition, wxSize(500, 220))
+    {
+        wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
+
+        // Горизонтальный блок для иконки и текста
+        wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
+
+        // Стандартная иконка ошибки
+        wxBitmap errorIcon = wxArtProvider::GetBitmap(wxART_ERROR, wxART_MESSAGE_BOX, wxSize(32, 32));
+        wxStaticBitmap* icon = new wxStaticBitmap(this, wxID_ANY, errorIcon);
+        topSizer->Add(icon, 0, wxALL | wxALIGN_TOP, 10);
+
+        wxStaticText* message = new wxStaticText(this, wxID_ANY,
+            "The program is running without elevated rights!\n\n"
+            "To make the program work correctly, open Terminal and run the command:"
+        );
+        topSizer->Add(message, 1, wxALL | wxALIGN_CENTER_VERTICAL, 10);
+
+        mainSizer->Add(topSizer, 0, wxEXPAND);
+
+        // Текстовое поле с командой (только для чтения)
+        wxTextCtrl* cmdField = new wxTextCtrl(this, wxID_ANY, cmd,
+                                              wxDefaultPosition, wxDefaultSize,
+                                              wxTE_READONLY);
+        mainSizer->Add(cmdField, 0, wxALL | wxEXPAND, 10);
+
+        // Кнопки
+        wxBoxSizer* btnSizer = new wxBoxSizer(wxHORIZONTAL);
+
+        wxButton* copyBtn = new wxButton(this, wxID_ANY, "Copy command");
+        wxButton* closeBtn = new wxButton(this, wxID_OK, "Close");
+
+        btnSizer->Add(copyBtn, 0, wxALL, 5);
+        btnSizer->Add(closeBtn, 0, wxALL, 5);
+
+        mainSizer->Add(btnSizer, 0, wxALIGN_CENTER);
+
+        SetSizerAndFit(mainSizer);
+
+        // Обработчик кнопки "Скопировать"
+        copyBtn->Bind(wxEVT_BUTTON, [cmd](wxCommandEvent&) {
+            if (wxTheClipboard->Open()) {
+                wxTheClipboard->SetData(new wxTextDataObject(cmd));
+                wxTheClipboard->Close();
+            }
+        });
+    }
+};
+
 // --- Класс приложения ---
 class MyApp : public wxApp {
  public:
@@ -139,9 +194,55 @@ class MyFrame : public wxFrame {
 wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit() {
-  MyFrame* frame = new MyFrame("CardMate"); // создаем главное окно
-  frame->Show(true);
-  return true;
+    if (geteuid() != 0) {
+        wxString exePath = wxStandardPaths::Get().GetExecutablePath();
+
+         // Формируем команду, которую пользователь должен выполнить в терминале
+        wxString cmd = "sudo \"" + exePath + "\"";
+
+        // // Показываем сообщение
+        // wxMessageBox(
+        //     "Программа запущена без повышенных прав!\n\n"
+        //     "Чтобы программа работала корректно, откройте Terminal и выполните команду:\n\n" +
+        //     cmd,
+        //     "Ошибка: Требуются права администратора",
+        //     wxOK | wxICON_ERROR
+        // );
+
+        // Создаём и показываем диалог
+        RootDialog dlg(nullptr, cmd);
+        dlg.ShowModal();
+
+        // // Преобразуем wxString в const char* через UTF-8
+        // const char* exeCStr = exePath.utf8_str();
+
+        // // Формируем аргументы для exec
+        // std::vector<char*> args;
+        // args.push_back(const_cast<char*>("sudo"));    // команда sudo
+        // args.push_back(const_cast<char*>(exeCStr));   // путь к текущему исполняемому файлу
+
+        // // Добавляем все аргументы, переданные программе
+        // int argc = wxApp::argc;
+        // char** argv = wxApp::argv;
+        // for (int i = 1; i < argc; i++) {
+        //     args.push_back(argv[i]);
+        // }
+        // args.push_back(nullptr); // завершающий nullptr
+
+        // // Перезапуск через sudo
+        // execvp("sudo", args.data());
+
+        // // Если execvp вернулся — ошибка
+        // wxMessageBox("Не удалось перезапустить программу с правами администратора!",
+        //              "Ошибка", wxOK | wxICON_ERROR);
+        return false;
+    }
+
+    // Если программа запущена с root — создаём главное окно
+    MyFrame* frame = new MyFrame("CardMate");
+    frame->Show(true);
+
+    return true;
 }
 
 // --- Реализация главного окна ---

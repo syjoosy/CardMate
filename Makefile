@@ -45,6 +45,8 @@ $(APP_BUNDLE): $(BIN) $(ICON_ICNS)
 	@mkdir -p $(MACOS) $(RESOURCES)
 	@cp $(BIN) $(MACOS)/
 	@cp $(ICON_ICNS) $(RESOURCES)/
+
+# Создаем Info.plist
 	@echo "Создаем Info.plist..."
 	@echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" > $(CONTENTS)/Info.plist
 	@echo "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">" >> $(CONTENTS)/Info.plist
@@ -61,12 +63,17 @@ $(APP_BUNDLE): $(BIN) $(ICON_ICNS)
 	@echo "  <key>CFBundleExecutable</key>" >> $(CONTENTS)/Info.plist
 	@echo "  <string>$(BIN)</string>" >> $(CONTENTS)/Info.plist
 	@echo "  <key>CFBundleIconFile</key>" >> $(CONTENTS)/Info.plist
-	@echo "  <string>$(ICON_ICNS)</string>" >> $(CONTENTS)/Info.plist
+	@echo "  <string>$(ICON_ICNS:.icns=)</string>" >> $(CONTENTS)/Info.plist  # <-- без .icns
 	@echo "  <key>CFBundlePackageType</key>" >> $(CONTENTS)/Info.plist
 	@echo "  <string>APPL</string>" >> $(CONTENTS)/Info.plist
 	@echo "</dict>" >> $(CONTENTS)/Info.plist
 	@echo "</plist>" >> $(CONTENTS)/Info.plist
+
+# Чтобы подпись не падала, гарантируем, что Resources не пустой
+	@touch $(RESOURCES)/.placeholder
+
 	@echo "Готово! .app bundle создан: $(APP_BUNDLE)"
+
 
 clean:
 	rm -f $(BIN)
