@@ -17,6 +17,85 @@
 wxDECLARE_EVENT(wxEVT_THREAD_UPDATE, wxThreadEvent); // объявление кастомного события
 wxDEFINE_EVENT(wxEVT_THREAD_UPDATE, wxThreadEvent);  // его определение
 
+// --- Класс для фонового копирования диска в файл ---
+class BackupThread : public wxThread {
+public:
+    BackupThread(wxWindow* parent, const wxString& srcDisk,
+                 const wxString& dstFile)
+        : wxThread(wxTHREAD_DETACHED),
+          m_parent(parent),
+          m_srcDisk(srcDisk),
+          m_dstFile(dstFile) {}
+
+protected:
+    virtual ExitCode Entry() override {
+        const size_t buf_size = 4 * 1024 * 1024;
+        char* buffer = new char[buf_size];
+
+        std::ifstream src(m_srcDisk.mb_str(), std::ios::binary);
+        if (!src) {
+            SendLog("Ошибка: не удалось открыть диск для чтения!");
+            delete[] buffer;
+            return (ExitCode)1;
+        }
+
+        std::ofstream dst(m_dstFile.mb_str(), std::ios::binary);
+        if (!dst) {
+            SendLog("Ошибка: не удалось создать файл образа!");
+            delete[] buffer;
+            return (ExitCode)1;
+        }
+
+        // Узнаём размер диска через lseek
+        src.seekg(0, std::ios::end);
+        size_t disk_size = src.tellg();
+        src.seekg(0, std::ios::beg);
+
+        size_t total_bytes = 0;
+        while (src) {
+            src.read(buffer, buf_size);
+            std::streamsize read_bytes = src.gcount();
+            if (read_bytes == 0) break;
+
+            dst.write(buffer, read_bytes);
+            total_bytes += read_bytes;
+
+            int percent = int((double)total_bytes / disk_size * 100);
+
+            wxString msg = wxString::Format("[PROGRESS] %d%% (%zu/%zu MB)\n",
+                                            percent,
+                                            total_bytes / 1000 / 1000,
+                                            disk_size / 1000 / 1000);
+            SendUpdate(percent, msg);
+        }
+
+        delete[] buffer;
+
+        SendUpdate(100, "Бэкап завершён!\n");
+        return (ExitCode)0;
+    }
+
+private:
+    wxWindow* m_parent;
+    wxString m_srcDisk;
+    wxString m_dstFile;
+
+    void SendUpdate(int percent, const wxString& msg) {
+        wxThreadEvent event(wxEVT_THREAD_UPDATE);
+        event.SetInt(percent);
+        event.SetString(msg);
+        wxQueueEvent(m_parent, event.Clone());
+    }
+
+    void SendLog(const wxString& msg) {
+        wxThreadEvent event(wxEVT_THREAD_UPDATE);
+        event.SetInt(-1);
+        event.SetString(msg + "\n");
+        wxQueueEvent(m_parent, event.Clone());
+    }
+};
+
+
 // --- Класс для фоновой записи файла на диск ---
 class FlashThread : public wxThread {
  public:
@@ -179,13 +258,24 @@ class MyFrame : public wxFrame {
   void OnStartWrite(wxCommandEvent& event);
   void OnUpdate(wxThreadEvent& event);
 
-  // Элементы интерфейса
+  // Backup обработчики
+  void OnSelectDiskBackup(wxCommandEvent& event);
+  void OnSaveImage(wxCommandEvent& event);
+  void OnStartBackup(wxCommandEvent& event);
+
+  // --- Flash UI ---
   wxTextCtrl* m_filePathText;   // путь к выбранному файлу
   wxTextCtrl* m_diskPathText;   // путь к выбранному диску
   wxTextCtrl* m_fileSizeText;   // размер выбранного файла
   wxTextCtrl* m_diskSizeText;   // размер выбранного диска
-  wxGauge* m_progressBar;       // индикатор прогресса
+  wxGauge*    m_progressBar;    // индикатор прогресса
   wxTextCtrl* m_logWindow;      // окно логов
+
+  // --- Backup UI ---
+  wxTextCtrl* m_backupDiskText;   // путь к выбранному диску
+  wxTextCtrl* m_backupFileText;   // путь к файлу образа
+  wxGauge*    m_backupProgress;   // индикатор прогресса
+  wxTextCtrl* m_backupLog;        // окно логов
 
   unsigned long long m_fileSizeBytes = 0; // размер файла в байтах
 };
@@ -314,9 +404,32 @@ MyFrame::MyFrame(const wxString& title)
   // --- Вкладка Backup ---
   wxPanel* backupPanel = new wxPanel(notebook, wxID_ANY);
   wxBoxSizer* bSizer = new wxBoxSizer(wxVERTICAL);
-  bSizer->Add(new wxStaticText(backupPanel, wxID_ANY, "Soon"),
-              1, wxALIGN_CENTER | wxALL, 20);
+
+  wxButton* btnSelectDiskBackup = new wxButton(backupPanel, 10, "Выбрать диск");
+  m_backupDiskText = new wxTextCtrl(backupPanel, wxID_ANY, "", wxDefaultPosition,
+                                    wxDefaultSize, wxTE_READONLY);
+
+  wxButton* btnSaveImage = new wxButton(backupPanel, 11, "Выбрать файл образа");
+  m_backupFileText = new wxTextCtrl(backupPanel, wxID_ANY, "", wxDefaultPosition,
+                                    wxDefaultSize, wxTE_READONLY);
+
+  m_backupProgress = new wxGauge(backupPanel, wxID_ANY, 100, wxDefaultPosition, wxSize(-1,25));
+  wxButton* btnStartBackup = new wxButton(backupPanel, 12, "Создать образ SD карты");
+
+  m_backupLog = new wxTextCtrl(backupPanel, wxID_ANY, "", wxDefaultPosition,
+                              wxSize(-1,200), wxTE_MULTILINE | wxTE_READONLY);
+
+  bSizer->Add(btnSelectDiskBackup, 0, wxEXPAND | wxALL, 5);
+  bSizer->Add(m_backupDiskText, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
+  bSizer->Add(btnSaveImage, 0, wxEXPAND | wxALL, 5);
+  bSizer->Add(m_backupFileText, 0, wxEXPAND | wxLEFT | wxRIGHT, 5);
+  bSizer->Add(m_backupProgress, 0, wxEXPAND | wxALL, 5);
+  bSizer->Add(btnStartBackup, 0, wxEXPAND | wxALL, 5);
+  bSizer->Add(new wxStaticText(backupPanel, wxID_ANY, "Лог выполнения:"), 0, wxLEFT | wxTOP, 5);
+  bSizer->Add(m_backupLog, 1, wxEXPAND | wxALL, 5);
+
   backupPanel->SetSizer(bSizer);
+
 
   // --- Вкладка Format ---
   wxPanel* formatPanel = new wxPanel(notebook, wxID_ANY);
@@ -337,6 +450,11 @@ MyFrame::MyFrame(const wxString& title)
   Bind(wxEVT_BUTTON, &MyFrame::OnSelectDisk, this, 2);
   Bind(wxEVT_BUTTON, &MyFrame::OnStartWrite, this, 3);
   Bind(wxEVT_THREAD_UPDATE, &MyFrame::OnUpdate, this);
+
+  Bind(wxEVT_BUTTON, &MyFrame::OnSelectDiskBackup, this, 10);
+  Bind(wxEVT_BUTTON, &MyFrame::OnSaveImage, this, 11);
+  Bind(wxEVT_BUTTON, &MyFrame::OnStartBackup, this, 12);
+
 }
 
 
@@ -459,4 +577,62 @@ void MyFrame::OnUpdate(wxThreadEvent& event) {
     }
   }
 }
+
+void MyFrame::OnSelectDiskBackup(wxCommandEvent&) {
+    wxArrayString output;
+    long exitCode = wxExecute("diskutil list", output, wxEXEC_SYNC);
+    if (exitCode != 0 || output.IsEmpty()) {
+        wxMessageBox("Не удалось получить список дисков!", "Ошибка",
+                     wxOK | wxICON_ERROR);
+        return;
+    }
+
+    wxArrayString disks;
+    for (auto& line : output) {
+        line.Trim(true).Trim(false);
+        if (line.StartsWith("/dev/disk")) {
+            disks.Add(line);
+        }
+    }
+
+    wxSingleChoiceDialog dlg(this, "Выберите диск для бэкапа:", "Доступные диски",
+                             disks);
+    if (dlg.ShowModal() == wxID_OK) {
+        wxString choice = dlg.GetStringSelection();
+        wxString diskPath = choice.BeforeFirst(' ');
+        m_backupDiskText->SetValue(diskPath);
+    }
+}
+
+void MyFrame::OnSaveImage(wxCommandEvent&) {
+    wxFileDialog saveDialog(this, _("Сохранить образ"), "", "",
+                            "Образ (*.img)|*.img",
+                            wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+
+    if (saveDialog.ShowModal() == wxID_OK) {
+        m_backupFileText->SetValue(saveDialog.GetPath());
+    }
+}
+
+void MyFrame::OnStartBackup(wxCommandEvent&) {
+    wxString diskPath = m_backupDiskText->GetValue();
+    wxString imgPath = m_backupFileText->GetValue();
+
+    if (diskPath.IsEmpty() || imgPath.IsEmpty()) {
+        wxMessageBox("Сначала выберите диск и файл образа!", "Ошибка",
+                     wxOK | wxICON_ERROR);
+        return;
+    }
+
+    m_backupProgress->SetValue(0);
+    m_backupLog->AppendText("Начат бэкап диска " + diskPath + " в файл " + imgPath + "\n");
+
+    BackupThread* thread = new BackupThread(this, diskPath, imgPath);
+    if (thread->Run() != wxTHREAD_NO_ERROR) {
+        wxMessageBox("Не удалось запустить поток бэкапа!", "Ошибка",
+                     wxOK | wxICON_ERROR);
+        delete thread;
+    }
+}
+
 
