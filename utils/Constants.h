@@ -3,7 +3,7 @@
 
 #include <wx/string.h>
 
-const wxString APP_VERSION = "v0.2 Dev Build";
+const wxString APP_VERSION = "v0.1 Dev Build";
 const wxString APP_NAME = "CardMate";
 
 // Event IDs

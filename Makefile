@@ -1,7 +1,6 @@
 # Имя приложения
 APP_NAME = CardMate
-SRC = main.cpp
-BIN = card_mate
+BIN = CardMate
 ICON_PNG = icon.png
 ICON_ICNS = $(ICON_PNG:.png=.icns)
 
@@ -11,10 +10,21 @@ CONTENTS = $(APP_BUNDLE)/Contents
 MACOS = $(CONTENTS)/MacOS
 RESOURCES = $(CONTENTS)/Resources
 
+# Компилятор и флаги
 CXX = g++
 CXXFLAGS = -std=c++17 `wx-config --cxxflags`
 LDFLAGS = `wx-config --libs`
 
+# Исходники
+SRC = main.cpp \
+      ui/MainFrame.cpp \
+      ui/RootDialog.cpp \
+      threads/FlashThread.cpp \
+      threads/BackupThread.cpp \
+      utils/DiskUtils.cpp \
+      threads/Events.cpp
+
+# Цель по умолчанию
 all: $(BIN) $(APP_BUNDLE)
 
 # Компиляция бинарника
@@ -63,18 +73,16 @@ $(APP_BUNDLE): $(BIN) $(ICON_ICNS)
 	@echo "  <key>CFBundleExecutable</key>" >> $(CONTENTS)/Info.plist
 	@echo "  <string>$(BIN)</string>" >> $(CONTENTS)/Info.plist
 	@echo "  <key>CFBundleIconFile</key>" >> $(CONTENTS)/Info.plist
-	@echo "  <string>$(ICON_ICNS:.icns=)</string>" >> $(CONTENTS)/Info.plist  # <-- без .icns
+	@echo "  <string>$(ICON_ICNS:.icns=)</string>" >> $(CONTENTS)/Info.plist
 	@echo "  <key>CFBundlePackageType</key>" >> $(CONTENTS)/Info.plist
 	@echo "  <string>APPL</string>" >> $(CONTENTS)/Info.plist
 	@echo "</dict>" >> $(CONTENTS)/Info.plist
 	@echo "</plist>" >> $(CONTENTS)/Info.plist
 
-# Чтобы подпись не падала, гарантируем, что Resources не пустой
 	@touch $(RESOURCES)/.placeholder
-
 	@echo "Готово! .app bundle создан: $(APP_BUNDLE)"
 
-
+# Очистка
 clean:
 	rm -f $(BIN)
 	rm -rf $(APP_BUNDLE) *.icns
