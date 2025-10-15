@@ -139,7 +139,7 @@ void MainFrame::CreateFormatTab(wxWindow* parent) {
     m_fsChoice->SetSelection(0);
 
     wxStaticText* nameLabel = new wxStaticText(parent, wxID_ANY, "Имя диска:");
-    wxTextCtrl* diskNameText = new wxTextCtrl(parent, wxID_ANY, "MYDISK");
+    diskNameText = new wxTextCtrl(parent, wxID_ANY, "MYDISK");
 
     wxButton* btnStartFormat = new wxButton(parent, ID_START_FORMAT, "Форматировать диск");
     m_formatLog = new wxTextCtrl(parent, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 200),
@@ -261,7 +261,7 @@ void MainFrame::OnStartFormat(wxCommandEvent&) {
     wxString fs = m_fsChoice->GetStringSelection();
     
     // Get disk name from UI (simplified - in real implementation you'd need to add this control)
-    wxString diskName = "UNTITLED";
+    wxString diskName = diskNameText->GetValue();
 
     if (diskPath.IsEmpty()) {
         wxMessageBox("Сначала выберите диск!", "Ошибка", wxOK | wxICON_ERROR);

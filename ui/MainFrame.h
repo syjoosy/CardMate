@@ -36,6 +36,7 @@ private:
     wxTextCtrl* m_formatDiskSizeText;
     wxChoice*   m_fsChoice;
     wxTextCtrl* m_formatLog;
+    wxTextCtrl* diskNameText;
 
     unsigned long long m_fileSizeBytes = 0;
 
