@@ -14,6 +14,7 @@ public:
 wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit() {
+    setlocale(LC_ALL, "");
     if (geteuid() != 0) {
         wxString exePath = wxStandardPaths::Get().GetExecutablePath();
         wxString cmd = "sudo \"" + exePath + "\"";

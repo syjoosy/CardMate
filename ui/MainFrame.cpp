@@ -139,7 +139,7 @@ void MainFrame::CreateFormatTab(wxWindow* parent) {
     m_fsChoice->SetSelection(0);
 
     wxStaticText* nameLabel = new wxStaticText(parent, wxID_ANY, "Имя диска:");
-    diskNameText = new wxTextCtrl(parent, wxID_ANY, "MYDISK");
+    diskNameText = new wxTextCtrl(parent, wxID_ANY, "MYDISK", wxDefaultPosition, wxDefaultSize, wxTE_RICH2);
 
     wxButton* btnStartFormat = new wxButton(parent, ID_START_FORMAT, "Форматировать диск");
     m_formatLog = new wxTextCtrl(parent, wxID_ANY, "", wxDefaultPosition, wxSize(-1, 200),
@@ -310,4 +310,22 @@ void MainFrame::OnUpdate(wxThreadEvent& event) {
             if (value == 100) wxMessageBox("Бэкап успешно завершён!");
         }
     }
+
+    // Всегда выводим лог
+    if (!log.IsEmpty())
+        m_backupLog->AppendText(log);
+
+    // Если это прогресс, обновляем полосу
+    if (value >= 0 && value <= 100)
+        m_backupProgress->SetValue(value);
+
+    if (value == 100)
+        wxMessageBox("Бэкап успешно завершён!");
 }
+
+// void MainFrame::OnUpdate(wxThreadEvent& event) {
+//     int value = event.GetInt();
+//     wxString log = event.GetString();
+
+
+// }

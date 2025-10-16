@@ -19,7 +19,7 @@ wxThread::ExitCode FlashThread::Entry() {
         delete[] buffer;
         return (ExitCode)1;
     }
-
+    // diskutil unmountDisk /dev/disk6
     std::ofstream dst(m_dstFile.mb_str(), std::ios::binary);
     if (!dst) {
         SendLog("Ошибка: не удалось открыть устройство для записи!");
