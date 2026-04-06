@@ -7,6 +7,7 @@ import sys
 from utils.paths import get_default_paths
 from utils.disks import get_macos_disks
 
+from utils.logging import log_message
 
 class BackupTab:
     def __init__(self, parent):
@@ -24,7 +25,7 @@ class BackupTab:
     def build_ui(self):
         self.title_label = ctk.CTkLabel(
             self.parent,
-            text="Создание образа диска",
+            text="Create disk image",
             font=ctk.CTkFont(size=18, weight="bold"),
         )
         self.title_label.pack(pady=20)
@@ -47,7 +48,7 @@ class BackupTab:
 
         self.note_source = ctk.CTkLabel(
             self.source_frame,
-            text="⚠️ Выбирайте диск целиком (/dev/diskX), не раздел!",
+            text="⚠️ Select the entire disk (/dev/diskX), not the partition!",
             font=ctk.CTkFont(size=10),
             text_color="gray",
         )
@@ -87,7 +88,7 @@ class BackupTab:
 
         self.btn_copy = ctk.CTkButton(
             self.control_frame,
-            text="НАЧАТЬ",
+            text="Start",
             command=self.start_process,
             width=200,
             height=35,
@@ -96,7 +97,7 @@ class BackupTab:
 
         self.btn_stop = ctk.CTkButton(
             self.control_frame,
-            text="СТОП",
+            text="Stop",
             command=self.stop_process,
             width=200,
             height=35,
@@ -107,7 +108,7 @@ class BackupTab:
 
         # STATUS
         self.log_label = ctk.CTkLabel(
-            self.parent, text="Готов", text_color="green"
+            self.parent, text="Ready", text_color="green"
         )
         self.log_label.pack(pady=10)
 
@@ -123,6 +124,8 @@ class BackupTab:
         self.log_text.insert("end", message + "\n")
         self.log_text.see("end")
         self.log_text.configure(state="disabled")
+
+        log_message("INFO", message)
 
     def log_status(self, message, color="white"):
         self.log_label.configure(text=message, text_color=color)
@@ -140,7 +143,7 @@ class BackupTab:
             if disks:
                 self.source_combo.set(disks[0][0])
 
-            self.log("Список дисков обновлён")
+            self.log("The list of disks has been updated")
 
     # =========================
     # DEST PATH
@@ -165,7 +168,7 @@ class BackupTab:
         dest = self.dest_entry.get().strip()
 
         if not source or not dest:
-            self.log("Ошибка: заполните поля")
+            self.log("Error: fill in the fields")
             return
 
         if not dest.endswith(".img"):
@@ -177,10 +180,10 @@ class BackupTab:
             source = source.replace("/dev/disk", "/dev/rdisk")
 
         if hasattr(os, "geteuid") and os.geteuid() != 0:
-            self.log("⚠️ Запуск без sudo может не сработать")
+            self.log("⚠️ Running without sudo may not work.")
 
         if "internal" in selected:
-            self.log("⚠️ ВНИМАНИЕ: выбран внутренний диск!")
+            self.log("⚠️ ATTENTION: the internal disk is selected!")
 
         cmd = [
             "dd",
@@ -208,7 +211,7 @@ class BackupTab:
                     self.log(line.strip())
 
         except Exception as e:
-            self.log(f"Ошибка: {e}")
+            self.log(f"Error: {e}")
 
         self.is_processing = False
         self.btn_copy.configure(state="normal")
@@ -230,7 +233,7 @@ class BackupTab:
     def stop_process(self):
         if self.process:
             self.process.terminate()
-            self.log("Остановлено")
+            self.log("Stopped")
 
         self.is_processing = False
         self.btn_copy.configure(state="normal")

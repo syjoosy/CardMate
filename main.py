@@ -5,6 +5,8 @@ from tabs.backup_tab import BackupTab
 from tabs.format_tab import FormatTab
 from tabs.about_tab import AboutTab
 
+from utils.logging import log_message
+
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
 
@@ -31,5 +33,6 @@ class CardMateApp(ctk.CTk):
 
 
 if __name__ == "__main__":
+    log_message("INFO", "App started!")
     app = CardMateApp()
     app.mainloop()
