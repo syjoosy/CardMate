@@ -110,18 +110,25 @@ class BackupTab:
         self.log_label = ctk.CTkLabel(
             self.parent, text="Ready", text_color="green"
         )
-        self.log_label.pack(pady=10)
+        self.log_label.pack(pady=5)
 
-        self.log_text = ctk.CTkTextbox(self.parent, width=500, height=150)
-        self.log_text.pack(padx=20, pady=10)
+        self.log_text = ctk.CTkTextbox(self.parent, width=500, height=300)
+        self.log_text.pack(padx=20, pady=5)
         self.log_text.configure(state="disabled")
+
+        self.log_text.tag_config("INFO", foreground="white")
+        self.log_text.tag_config("WARNING", foreground="orange")
+        self.log_text.tag_config("ERROR", foreground="red")
+        self.log_text.tag_config("SUCCESS", foreground="green")
+        self.log_text.tag_config("CRITICAL", foreground="red")
+        self.log_text.tag_config("DEBUG", foreground="gray")
 
     # =========================
     # LOGGING
     # =========================
     def log(self, severity, message):
         self.log_text.configure(state="normal")
-        self.log_text.insert("end", message + "\n")
+        self.log_text.insert("end", message + "\n", severity)
         self.log_text.see("end")
         self.log_text.configure(state="disabled")
 
@@ -203,12 +210,15 @@ class BackupTab:
 
             while True:
                 if self.process.poll() is not None:
-                    self.log_status("Готово", "green")
+                    self.log_status("Done", "green")
                     break
 
                 line = self.process.stdout.readline()
                 if line:
-                    self.log(INFO, line.strip())
+                    if "Permission denied" in line:
+                        self.log(ERROR, line.strip())
+                    else:
+                        self.log(INFO, line.strip())
 
         except Exception as e:
             self.log(ERROR, f"Error: {e}")
@@ -223,6 +233,14 @@ class BackupTab:
     def start_process(self):
         if self.is_processing:
             return
+
+        selected = self.source_combo.get().strip()
+        source = self.device_map.get(selected, selected)
+        dest = self.dest_entry.get().strip()
+
+        self.log(INFO, f"Start backup!")
+        self.log(INFO, f"Source: {source}")
+        self.log(INFO, f"Destination: {dest}")
 
         self.is_processing = True
         self.btn_copy.configure(state="disabled")
