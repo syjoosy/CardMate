@@ -7,7 +7,7 @@ import sys
 from utils.paths import get_default_paths
 from utils.disks import get_macos_disks
 
-from utils.logging import log_message
+from utils.logging import log_message, DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 class BackupTab:
     def __init__(self, parent):
@@ -119,13 +119,13 @@ class BackupTab:
     # =========================
     # LOGGING
     # =========================
-    def log(self, message):
+    def log(self, severity, message):
         self.log_text.configure(state="normal")
         self.log_text.insert("end", message + "\n")
         self.log_text.see("end")
         self.log_text.configure(state="disabled")
 
-        log_message("INFO", message)
+        log_message(severity, message)
 
     def log_status(self, message, color="white"):
         self.log_label.configure(text=message, text_color=color)
@@ -143,7 +143,7 @@ class BackupTab:
             if disks:
                 self.source_combo.set(disks[0][0])
 
-            self.log("The list of disks has been updated")
+            self.log(INFO, "The list of disks has been updated")
 
     # =========================
     # DEST PATH
@@ -168,7 +168,7 @@ class BackupTab:
         dest = self.dest_entry.get().strip()
 
         if not source or not dest:
-            self.log("Error: fill in the fields")
+            self.log(ERROR, "Error: fill in the fields")
             return
 
         if not dest.endswith(".img"):
@@ -180,10 +180,10 @@ class BackupTab:
             source = source.replace("/dev/disk", "/dev/rdisk")
 
         if hasattr(os, "geteuid") and os.geteuid() != 0:
-            self.log("⚠️ Running without sudo may not work.")
+            self.log(WARNING, "⚠️ Running without sudo may not work.")
 
         if "internal" in selected:
-            self.log("⚠️ ATTENTION: the internal disk is selected!")
+            self.log(WARNING, "⚠️ ATTENTION: the internal disk is selected!")
 
         cmd = [
             "dd",
@@ -208,10 +208,10 @@ class BackupTab:
 
                 line = self.process.stdout.readline()
                 if line:
-                    self.log(line.strip())
+                    self.log(INFO, line.strip())
 
         except Exception as e:
-            self.log(f"Error: {e}")
+            self.log(ERROR, f"Error: {e}")
 
         self.is_processing = False
         self.btn_copy.configure(state="normal")
@@ -233,7 +233,7 @@ class BackupTab:
     def stop_process(self):
         if self.process:
             self.process.terminate()
-            self.log("Stopped")
+            self.log(INFO, "Stopped")
 
         self.is_processing = False
         self.btn_copy.configure(state="normal")
