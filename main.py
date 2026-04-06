@@ -13,7 +13,7 @@ class CardMateApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("CardMate v0.1")
+        self.title("CardMate")
         self.geometry("650x450")
 
         self.tabview = ctk.CTkTabview(self)
