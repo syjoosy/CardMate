@@ -16,10 +16,25 @@ SUCCESS_LEVEL_NUM = 35
 # Регистрируем новый уровень в logging
 logging.addLevelName(SUCCESS_LEVEL_NUM, SUCCESS)
 
+MAC_OS_LOG_PATH = "~/Library/Logs/CardMate/"
+LINUX_LOG_PATH = "/var/log/CardMate/"
+WINDOWS_LOG_PATH = "~/Library/Logs/CardMate/"
+
+if sys.platform == "darwin":
+    LOG_DIR = os.path.expanduser(MAC_OS_LOG_PATH)
+elif sys.platform.startswith("win"):
+    LOG_DIR = os.path.expanduser(WINDOWS_LOG_PATH)
+elif sys.platform.startswith("linux"):
+    LOG_DIR = os.path.expanduser(LINUX_LOG_PATH)
+else:
+    LOG_DIR = os.path.expanduser(LINUX_LOG_PATH)
+
 # Создаем папку logs, если её нет
-LOG_DIR = "logs"
 if not os.path.exists(LOG_DIR):
-    os.makedirs(LOG_DIR)
+    try:
+        os.makedirs(LOG_DIR)
+    except Exception as e:
+        print(f"ERROR: {e}")
 
 # Формируем имя файла с текущей датой и временем
 # Формат: cardMate_2024-01-15_14-30-45.log
@@ -115,3 +130,15 @@ def log_message(severity, message):
         logger.critical(message)
     elif severity == "SUCCESS":  # Добавляем обработку SUCCESS
         logger.success(message)
+
+# Создаем папку logs, если её нет
+if sys.platform == "darwin":
+    logger.info("Detected OS: MacOS")
+elif sys.platform.startswith("win"):
+    logger.info("Detected OS: Windows")
+elif sys.platform.startswith("linux"):
+    logger.info("Detected OS: Linux")
+else:
+    logger.info("Detected OS: Unknown")
+
+logger.info("Using log path: " + LOG_DIR)

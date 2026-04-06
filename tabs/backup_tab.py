@@ -251,7 +251,7 @@ class BackupTab:
     def stop_process(self):
         if self.process:
             self.process.terminate()
-            self.log(INFO, "Stopped")
+            self.log(WARNING, "Stopped backup")
 
         self.is_processing = False
         self.btn_copy.configure(state="normal")
