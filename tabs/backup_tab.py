@@ -7,7 +7,7 @@ import sys
 from utils.paths import get_default_paths
 from utils.disks import get_macos_disks
 
-from utils.logging import log_message, DEBUG, INFO, WARNING, ERROR, CRITICAL
+from utils.logging import log_message, DEBUG, INFO, WARNING, ERROR, SUCCESS, CRITICAL
 
 class BackupTab:
     def __init__(self, parent):
@@ -19,8 +19,13 @@ class BackupTab:
 
         self.default_paths = get_default_paths()
 
+        log_message(INFO, "Generate Backup Tab!")
+
+        
+
         self.build_ui()
         self.refresh_disks()
+
 
     def build_ui(self):
         self.title_label = ctk.CTkLabel(

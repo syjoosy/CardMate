@@ -31,6 +31,18 @@ class CardMateApp(ctk.CTk):
         FormatTab(self.tabview.tab("Format"))
         AboutTab(self.tabview.tab("About"))
 
+        original_command = self.tabview._segmented_button.cget("command")
+
+        def wrapped_command(tab_name):
+            if original_command:
+                original_command(tab_name)
+
+            self.on_tab_change(tab_name)
+
+        self.tabview._segmented_button.configure(command=wrapped_command)
+
+    def on_tab_change(self, tab_name):
+        log_message(INFO, "Switched to: " + tab_name)
 
 if __name__ == "__main__":
     log_message(INFO, "App started!")
