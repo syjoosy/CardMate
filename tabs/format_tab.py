@@ -68,6 +68,41 @@ class FormatTab:
         self.fs_combo.grid(row=0, column=1, padx=10, pady=5)
         self.fs_combo.set("APFS")
 
+        # VOLUME NAME
+        self.name_frame = ctk.CTkFrame(self.parent)
+        self.name_frame.pack(padx=20, fill="x", pady=10)
+
+        ctk.CTkLabel(self.name_frame, text="Volume Name:").grid(
+            row=0, column=0, padx=10, pady=5, sticky="w"
+        )
+
+        self.name_combo = ctk.CTkComboBox(
+            self.name_frame,
+            values=[
+                "MyDisk",
+                "Backup",
+                "Storage",
+                "Data",
+                "External",
+                "USB",
+                "Work",
+                "Media",
+            ],
+            width=180,
+            command=self.on_name_select,
+        )
+        self.name_combo.grid(row=0, column=1, padx=10, pady=5)
+
+        self.name_entry = ctk.CTkEntry(
+            self.name_frame,
+            placeholder_text="Enter volume name",
+            width=260,
+        )
+        self.name_entry.grid(row=0, column=2, padx=10, pady=5)
+
+        self.name_combo.set("MyDisk")
+        self.name_entry.insert(0, "MyDisk")
+
         # WARNING
         self.warning_label = ctk.CTkLabel(
             self.parent,
@@ -109,6 +144,10 @@ class FormatTab:
         self.log_text = ctk.CTkTextbox(self.parent, width=500, height=300)
         self.log_text.pack(padx=20, pady=5)
         self.log_text.configure(state="disabled")
+    
+    def on_name_select(self, choice):
+        self.name_entry.delete(0, "end")
+        self.name_entry.insert(0, choice)
 
     # =========================
     # LOG
@@ -154,7 +193,10 @@ class FormatTab:
         if "internal" in selected.lower():
             self.log(WARNING, "⚠️ INTERNAL DISK SELECTED!")
 
-        volume_name = "FormattedDisk"
+        volume_name = self.name_entry.get().strip()
+
+        if not volume_name:
+            volume_name = "MyDisk"
 
         cmd = [
             "diskutil",
