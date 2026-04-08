@@ -5,7 +5,7 @@ import sys
 
 from utils.disks import get_macos_disks
 from utils.logging import log_message, INFO, WARNING, ERROR
-
+from utils.commands import format_disk
 
 class FormatTab:
     def __init__(self, parent):
@@ -198,13 +198,7 @@ class FormatTab:
         if not volume_name:
             volume_name = "MyDisk"
 
-        cmd = [
-            "diskutil",
-            "eraseDisk",
-            fs,
-            volume_name,
-            disk,
-        ]
+        cmd = format_disk(disk, fs, volume_name)
 
         try:
             self.process = subprocess.Popen(
