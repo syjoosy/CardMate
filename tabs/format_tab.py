@@ -65,7 +65,7 @@ class FormatTab:
 
         if filesystems:
             self.fs_combo.set(filesystems[0])
-            
+
         self.fs_combo.grid(row=0, column=1, padx=10, pady=5)
         self.fs_combo.set("APFS")
 
@@ -200,6 +200,8 @@ class FormatTab:
             volume_name = "MyDisk"
 
         cmd = format_disk(disk, fs, volume_name)
+
+        self.log(INFO, "Command: " + str(cmd))
 
         try:
             self.process = subprocess.Popen(

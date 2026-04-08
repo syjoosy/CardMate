@@ -199,6 +199,8 @@ class BackupTab:
 
         cmd = create_backup(source, dest)
 
+        self.log(INFO, "Command: " + str(cmd))
+
         try:
             self.process = subprocess.Popen(
                 cmd,
