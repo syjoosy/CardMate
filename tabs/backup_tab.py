@@ -6,7 +6,7 @@ import sys
 
 from utils.paths import get_default_paths
 from utils.disks import get_macos_disks
-
+from utils.commands import create_backup
 from utils.logging import log_message, DEBUG, INFO, WARNING, ERROR, SUCCESS, CRITICAL
 
 class BackupTab:
@@ -197,13 +197,7 @@ class BackupTab:
         if "internal" in selected:
             self.log(WARNING, "⚠️ ATTENTION: the internal disk is selected!")
 
-        cmd = [
-            "dd",
-            f"if={source}",
-            f"of={dest}",
-            "status=progress",
-            "conv=noerror,sync",
-        ]
+        cmd = create_backup(source, dest)
 
         try:
             self.process = subprocess.Popen(

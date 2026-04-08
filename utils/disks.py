@@ -1,7 +1,8 @@
 import subprocess
-
+from utils.logging import log_message, DEBUG, INFO, WARNING, ERROR, SUCCESS, CRITICAL
 
 def get_macos_disks():
+    log_message(INFO, "Start disk refresh!")
     disks = []
 
     result = subprocess.run(
@@ -38,5 +39,7 @@ def get_macos_disks():
 
             display = f"{disk_name} ({size}, {disk_type} {protocol})"
             disks.append((display, disk_name))
-
+    
+    log_message(INFO, "Disks: ")
+    log_message(INFO, disks)
     return disks

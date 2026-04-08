@@ -54,6 +54,9 @@ class CardMateApp(ctk.CTk):
         # Подменяем обработчик на наш (но с сохранением оригинального поведения)
         self.tabview._segmented_button.configure(command=wrapped_command)
 
+        # Лог об успешной инициализации
+        log_message(SUCCESS, "App init success!")
+
     # Обработчик смены вкладки
     def on_tab_change(self, tab_name):
         # Вызывается каждый раз при переключении вкладки
