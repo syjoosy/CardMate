@@ -19,7 +19,7 @@ class CardMateApp(ctk.CTk):
 
         # Заголовок и размер окна
         self.title("CardMate")
-        self.geometry("650x450")
+        self.geometry("650x550")
 
         # Создаём контейнер с вкладками
         self.tabview = ctk.CTkTabview(self)

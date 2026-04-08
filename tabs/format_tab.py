@@ -5,7 +5,7 @@ import sys
 
 from utils.disks import get_macos_disks
 from utils.logging import log_message, INFO, WARNING, ERROR
-from utils.commands import format_disk
+from utils.commands import format_disk, get_filesystems
 
 class FormatTab:
     def __init__(self, parent):
@@ -55,16 +55,17 @@ class FormatTab:
             row=0, column=0, padx=10, pady=5, sticky="w"
         )
 
+        filesystems = get_filesystems()
+
         self.fs_combo = ctk.CTkComboBox(
             self.fs_frame,
-            values=[
-                "APFS",
-                "Mac OS Extended (Journaled)",
-                "ExFAT",
-                "MS-DOS (FAT32)",
-            ],
+            values=filesystems,
             width=360,
         )
+
+        if filesystems:
+            self.fs_combo.set(filesystems[0])
+            
         self.fs_combo.grid(row=0, column=1, padx=10, pady=5)
         self.fs_combo.set("APFS")
 

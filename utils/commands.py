@@ -12,6 +12,48 @@ def get_platform():
         return "windows"
     return "unknown"
 
+# =========================
+# FILESYSTEMS
+# =========================
+def get_filesystems():
+    platform = get_platform()
+
+    if platform == "macos":
+        return _fs_macos()
+
+    elif platform == "linux":
+        return _fs_linux()
+
+    elif platform == "windows":
+        return _fs_windows()
+
+    else:
+        return []
+
+def _fs_macos():
+    return [
+        "APFS",
+        "JHFS+",      # Mac OS Extended (Journaled)
+        "ExFAT",
+        "FAT32",
+    ]
+
+def _fs_linux():
+    return [
+        "ext4",
+        "ext3",
+        "ext2",
+        "vfat",
+        "ntfs",
+        "exfat",
+    ]
+
+def _fs_windows():
+    return [
+        "NTFS",
+        "exFAT",
+        "FAT32",
+    ]
 
 # =========================
 # FORMAT DISK
