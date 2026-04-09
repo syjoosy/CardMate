@@ -1,4 +1,5 @@
 import sys
+from utils.disks import get_macos_disks, get_linux_disks
 
 # =========================
 # OS DETECTION
@@ -54,6 +55,24 @@ def _fs_windows():
         "exFAT",
         "FAT32",
     ]
+
+# =========================
+# GET DISK LIST
+# =========================
+def get_disk_list():
+    platform = get_platform()
+
+    if platform == "macos":
+        return get_macos_disks()
+
+    elif platform == "linux":
+        return get_linux_disks()
+
+    elif platform == "windows":
+        raise NotImplementedError("Windows get disk not implemented yet")
+
+    else:
+        return []
 
 # =========================
 # FORMAT DISK

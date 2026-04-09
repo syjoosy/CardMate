@@ -6,7 +6,7 @@ import sys
 
 from utils.paths import get_default_paths
 from utils.disks import get_macos_disks
-from utils.commands import create_backup
+from utils.commands import create_backup, get_disk_list
 from utils.logging import log_message, DEBUG, INFO, WARNING, ERROR, SUCCESS, CRITICAL
 
 class BackupTab:
@@ -146,16 +146,15 @@ class BackupTab:
     # DISKS
     # =========================
     def refresh_disks(self):
-        if sys.platform == "darwin":
-            disks = get_macos_disks()
-            self.device_map = {name: path for name, path in disks}
+        disks = get_disk_list()
+        self.device_map = {name: path for name, path in disks}
 
-            self.source_combo.configure(values=list(self.device_map.keys()))
+        self.source_combo.configure(values=list(self.device_map.keys()))
 
-            if disks:
-                self.source_combo.set(disks[0][0])
+        if disks:
+            self.source_combo.set(disks[0][0])
 
-            self.log(INFO, "The list of disks has been updated")
+        self.log(INFO, "The list of disks has been updated")
 
     # =========================
     # DEST PATH

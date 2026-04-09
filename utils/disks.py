@@ -43,3 +43,45 @@ def get_macos_disks():
     log_message(INFO, "Disks: ")
     log_message(INFO, disks)
     return disks
+
+def get_linux_disks():
+    log_message(INFO, "Start disk refresh!")
+    disks = []
+
+    result = subprocess.run(
+        ["lsblk", "-d", "-o", "NAME,SIZE,TYPE,TRAN"],
+        capture_output=True,
+        text=True
+    )
+
+    lines = result.stdout.splitlines()
+
+    # Пропускаем заголовок
+    for line in lines[1:]:
+        parts = line.split()
+
+        if len(parts) < 3:
+            continue
+
+        name, size, dev_type = parts[:3]
+        tran = parts[3] if len(parts) > 3 else ""
+
+        # Берем только реальные диски (не разделы)
+        if dev_type != "disk":
+            continue
+
+        disk_name = f"/dev/{name}"
+
+        # Определяем тип (внутренний/внешний условно)
+        if tran in ["usb"]:
+            disk_type = "external"
+        else:
+            disk_type = "internal"
+
+        display = f"{disk_name} ({size}, {disk_type} {tran})"
+        disks.append((display, disk_name))
+
+    log_message(INFO, "Disks:")
+    log_message(INFO, disks)
+
+    return disks
