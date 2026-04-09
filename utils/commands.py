@@ -1,5 +1,5 @@
 import sys
-from utils.disks import get_macos_disks, get_linux_disks
+from utils.disks import _get_macos_disks, _get_linux_disks
 
 # =========================
 # OS DETECTION
@@ -63,10 +63,10 @@ def get_disk_list():
     platform = get_platform()
 
     if platform == "macos":
-        return get_macos_disks()
+        return _get_macos_disks()
 
     elif platform == "linux":
-        return get_linux_disks()
+        return _get_linux_disks()
 
     elif platform == "windows":
         raise NotImplementedError("Windows get disk not implemented yet")

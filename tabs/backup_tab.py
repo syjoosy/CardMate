@@ -5,7 +5,6 @@ import os
 import sys
 
 from utils.paths import get_default_paths
-from utils.disks import get_macos_disks
 from utils.commands import create_backup, get_disk_list
 from utils.logging import log_message, DEBUG, INFO, WARNING, ERROR, SUCCESS, CRITICAL
 

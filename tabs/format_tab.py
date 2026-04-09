@@ -3,9 +3,8 @@ import threading
 import subprocess
 import sys
 
-from utils.disks import get_macos_disks
 from utils.logging import log_message, INFO, WARNING, ERROR
-from utils.commands import format_disk, get_filesystems
+from utils.commands import format_disk, get_filesystems, get_disk_list
 
 class FormatTab:
     def __init__(self, parent):
@@ -168,16 +167,16 @@ class FormatTab:
     # DISKS
     # =========================
     def refresh_disks(self):
-        if sys.platform == "darwin":
-            disks = get_macos_disks()
-            self.device_map = {name: path for name, path in disks}
+        
+        disks = get_disk_list()
+        self.device_map = {name: path for name, path in disks}
 
-            self.disk_combo.configure(values=list(self.device_map.keys()))
+        self.disk_combo.configure(values=list(self.device_map.keys()))
 
-            if disks:
-                self.disk_combo.set(disks[0][0])
+        if disks:
+            self.disk_combo.set(disks[0][0])
 
-            self.log(INFO, "Disk list updated")
+        self.log(INFO, "Disk list updated")
 
     # =========================
     # FORMAT PROCESS
