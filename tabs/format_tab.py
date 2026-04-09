@@ -5,6 +5,7 @@ import sys
 
 from utils.logging import log_message, INFO, WARNING, ERROR
 from utils.commands import format_disk, get_filesystems, get_disk_list
+from ui.dialog import show_dialog
 
 class FormatTab:
     def __init__(self, parent):
@@ -225,6 +226,8 @@ class FormatTab:
         self.is_processing = False
         self.btn_start.configure(state="normal")
         self.btn_stop.configure(state="disabled")
+
+        show_dialog(self.parent, "Ready", "Format finished!")
 
     # =========================
     # CONTROL
