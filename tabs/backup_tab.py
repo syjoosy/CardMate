@@ -226,6 +226,9 @@ class BackupTab:
         self.btn_copy.configure(state="normal")
         self.btn_stop.configure(state="disabled")
 
+        show_dialog(self.parent, "Ready", "Backup finished!")
+        self.log(INFO, "Backup finished")
+
     # =========================
     # CONTROL
     # =========================
@@ -250,8 +253,10 @@ class BackupTab:
     def stop_process(self):
         if self.process:
             self.process.terminate()
-            self.log(WARNING, "Stopped backup")
+            self.log(WARNING, "Backup stopped!")
 
         self.is_processing = False
         self.btn_copy.configure(state="normal")
         self.btn_stop.configure(state="disabled")
+
+        show_dialog(self.parent, "Warning", "Backup stopped!", type_='warning')

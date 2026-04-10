@@ -228,6 +228,7 @@ class FormatTab:
         self.btn_stop.configure(state="disabled")
 
         show_dialog(self.parent, "Ready", "Format finished!")
+        self.log(INFO, "Format finished")
 
     # =========================
     # CONTROL
@@ -252,3 +253,5 @@ class FormatTab:
         self.is_processing = False
         self.btn_start.configure(state="normal")
         self.btn_stop.configure(state="disabled")
+
+        show_dialog(self.parent, "Warning", "Format stopped!", type_='warning')
