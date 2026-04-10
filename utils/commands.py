@@ -75,6 +75,68 @@ def get_disk_list():
         return []
 
 # =========================
+# UNMOUNT DISK
+# =========================
+def unmount_disk(disk):
+    platform = get_platform()
+
+    if platform == "macos":
+        return ["diskutil", "unmountDisk", disk]
+
+    elif platform == "linux":
+        # размонтировать все разделы
+        return ["bash", "-c", f"umount {disk}*"]
+
+    elif platform == "windows":
+        raise NotImplementedError("Unmount not implemented for Windows")
+
+    else:
+        raise Exception("Unsupported OS")
+
+
+# =========================
+# FLASH (DD WRITE)
+# =========================
+def flash_disk(image, target):
+    platform = get_platform()
+
+    if platform == "macos":
+        return _flash_macos(image, target)
+
+    elif platform == "linux":
+        return _flash_linux(image, target)
+
+    elif platform == "windows":
+        raise NotImplementedError("Flash not implemented for Windows")
+
+    else:
+        raise Exception("Unsupported OS")
+
+
+def _flash_macos(image, target):
+    # raw disk = быстрее
+    if target.startswith("/dev/disk"):
+        target = target.replace("/dev/disk", "/dev/rdisk")
+
+    return [
+        "dd",
+        f"if={image}",
+        f"of={target}",
+        "bs=4m",
+        "status=progress",
+    ]
+
+
+def _flash_linux(image, target):
+    return [
+        "dd",
+        f"if={image}",
+        f"of={target}",
+        "bs=4M",
+        "status=progress",
+    ]
+
+# =========================
 # FORMAT DISK
 # =========================
 def format_disk(disk, filesystem, volume_name):

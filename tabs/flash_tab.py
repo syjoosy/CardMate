@@ -5,7 +5,7 @@ import os
 import sys
 from tkinter import filedialog
 
-from utils.commands import get_disk_list
+from utils.commands import get_disk_list, flash_disk, unmount_disk
 from utils.logging import log_message, DEBUG, INFO, WARNING, ERROR, SUCCESS, CRITICAL
 
 
@@ -188,8 +188,22 @@ class FlashTab:
         if "internal" in selected:
             self.log(CRITICAL, "🚨 YOU ARE FLASHING INTERNAL DISK!")
 
-        cmd = ["dd", f"if={image}", f"of={target}", "bs=4m", "status=progress"]
+        try:
+            # =========================
+            # UNMOUNT
+            # =========================
+            umount_cmd = unmount_disk(target)
+            self.log(INFO, "Unmounting disk...")
+            self.log(INFO, "Command: ".join(umount_cmd))
 
+            subprocess.run(umount_cmd, check=True)
+            self.log(SUCCESS, "Disk unmounted")
+
+        except Exception as e:
+            self.log(ERROR, f"Unmount failed: {e}")
+            return
+
+        cmd = flash_disk(image, target)
         self.log(INFO, "Command: " + " ".join(cmd))
 
         try:
@@ -207,7 +221,12 @@ class FlashTab:
 
                 line = self.process.stdout.readline()
                 if line:
-                    self.log(INFO, line.strip())
+                    if "Permission denied" in line:
+                        self.log(ERROR, line.strip())
+                    elif "busy" in line:
+                        self.log(ERROR, line.strip())
+                    else:
+                        self.log(INFO, line.strip())
 
         except Exception as e:
             self.log(ERROR, f"Error: {e}")
