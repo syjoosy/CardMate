@@ -2,9 +2,13 @@ import customtkinter as ctk
 import traceback
 
 
+import traceback
+import sys
+
+
 def show_error_dialog(parent, title="Error", exc=None, tb=None, modal=True):
     """
-    Диалог ошибки с возможностью просмотра traceback
+    Диалог ошибки с traceback + копирование + выход из приложения
     """
 
     dialog = ctk.CTkToplevel(parent)
@@ -14,13 +18,13 @@ def show_error_dialog(parent, title="Error", exc=None, tb=None, modal=True):
     if modal:
         dialog.grab_set()
 
-    dialog.minsize(400, 250)
+    dialog.minsize(450, 300)
 
     # ===== Контейнер =====
     frame = ctk.CTkFrame(dialog)
     frame.pack(fill="both", expand=True, padx=15, pady=15)
 
-    # ===== Верх (иконка + текст) =====
+    # ===== Верх (иконка + сообщение) =====
     top_frame = ctk.CTkFrame(frame, fg_color="transparent")
     top_frame.pack(fill="x", pady=(0, 10))
 
@@ -31,7 +35,6 @@ def show_error_dialog(parent, title="Error", exc=None, tb=None, modal=True):
     )
     icon.pack(side="left", padx=(0, 10))
 
-    # Сообщение ошибки
     if exc:
         short_msg = f"{type(exc).__name__}: {exc}"
     else:
@@ -41,15 +44,14 @@ def show_error_dialog(parent, title="Error", exc=None, tb=None, modal=True):
         top_frame,
         text=short_msg,
         justify="left",
-        wraplength=350
+        wraplength=380
     )
     msg_label.pack(side="left", fill="x", expand=True)
 
-    # ===== Textbox для traceback =====
-    textbox = ctk.CTkTextbox(frame, height=150)
+    # ===== Textbox =====
+    textbox = ctk.CTkTextbox(frame, height=180)
     textbox.pack(fill="both", expand=True)
 
-    # Формируем traceback
     if exc and tb:
         error_text = "".join(traceback.format_exception(type(exc), exc, tb))
     else:
@@ -60,17 +62,49 @@ def show_error_dialog(parent, title="Error", exc=None, tb=None, modal=True):
 
     # ===== Кнопки =====
     btn_frame = ctk.CTkFrame(frame, fg_color="transparent")
-    btn_frame.pack(pady=(10, 0))
+    btn_frame.pack(pady=(10, 0), fill="x")
+
+    def copy_to_clipboard():
+        dialog.clipboard_clear()
+        dialog.clipboard_append(error_text)
 
     def close():
         dialog.destroy()
 
-    close_btn = ctk.CTkButton(btn_frame, text="Close", command=close)
-    close_btn.pack()
+    def exit_app():
+        dialog.destroy()
+        parent.destroy()  # закрывает всё приложение
+        sys.exit(1)
+
+    copy_btn = ctk.CTkButton(
+        btn_frame,
+        text="Copy",
+        width=100,
+        command=copy_to_clipboard
+    )
+    copy_btn.pack(side="left", padx=5)
+
+    close_btn = ctk.CTkButton(
+        btn_frame,
+        text="Close",
+        width=100,
+        command=close
+    )
+    close_btn.pack(side="left", padx=5)
+
+    exit_btn = ctk.CTkButton(
+        btn_frame,
+        text="Exit",
+        width=100,
+        fg_color="#e74c3c",
+        hover_color="#c0392b",
+        command=exit_app
+    )
+    exit_btn.pack(side="right", padx=5)
 
     # ===== Авторазмер =====
     dialog.update_idletasks()
-    dialog.geometry("600x400")
+    dialog.geometry("650x420")
 
     return dialog
 
