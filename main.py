@@ -4,6 +4,7 @@ import customtkinter as ctk
 from tabs.flash_tab import FlashTab
 from tabs.backup_tab import BackupTab
 from tabs.format_tab import FormatTab
+from tabs.settings_tab import SettingsTab
 from tabs.about_tab import AboutTab
 
 # Импорт логирования
@@ -85,6 +86,7 @@ class CardMateApp(ctk.CTk):
             ("Flash", FlashTab),
             ("Backup", BackupTab),
             ("Format", FormatTab),
+            ("Settings", SettingsTab),
             ("About", AboutTab),
         ]
 
