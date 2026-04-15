@@ -32,6 +32,7 @@ class CardMateApp(ctk.CTk):
         self.tabview.add("Flash")
         self.tabview.add("Backup")
         self.tabview.add("Format")
+        self.tabview.add("Settings")
         self.tabview.add("About")
 
         # --- OVERLAY С ЗАГРУЗКОЙ (ПОВЕРХ ВСЕГО UI) ---
