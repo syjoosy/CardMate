@@ -186,9 +186,6 @@ class BackupTab:
             self.dest_entry.delete(0, "end")
             self.dest_entry.insert(0, dest)
 
-        if sys.platform == "darwin" and source.startswith("/dev/disk"):
-            source = source.replace("/dev/disk", "/dev/rdisk")
-
         if hasattr(os, "geteuid") and os.geteuid() != 0:
             self.log(WARNING, "⚠️ Running without sudo may not work.")
 

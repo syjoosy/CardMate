@@ -179,9 +179,6 @@ class FlashTab:
             self.log(ERROR, "Image file not found!")
             return
 
-        if sys.platform == "darwin" and target.startswith("/dev/disk"):
-            target = target.replace("/dev/disk", "/dev/rdisk")
-
         if hasattr(os, "geteuid") and os.geteuid() != 0:
             self.log(WARNING, "⚠️ Running without sudo may not work.")
 

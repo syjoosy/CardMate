@@ -114,10 +114,6 @@ def flash_disk(image, target):
 
 
 def _flash_macos(image, target):
-    # raw disk = быстрее
-    if target.startswith("/dev/disk"):
-        target = target.replace("/dev/disk", "/dev/rdisk")
-
     return [
         "dd",
         f"if={image}",
@@ -185,9 +181,6 @@ def create_backup(source, destination):
 
 
 def _backup_macos(source, destination):
-    if source.startswith("/dev/disk"):
-        source = source.replace("/dev/disk", "/dev/rdisk")
-
     return [
         "dd",
         f"if={source}",
