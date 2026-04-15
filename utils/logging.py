@@ -6,6 +6,8 @@ import traceback
 from datetime import datetime
 import tkinter as tk
 
+from ui.dialog import show_dialog, show_error_dialog
+
 DEBUG = "DEBUG"
 INFO = "INFO"
 WARNING = "WARNING"
@@ -126,6 +128,8 @@ def tk_exception_handler(self, exc, val, tb):
         "Tkinter callback exception",
         exc_info=(exc, val, tb)
     )
+
+    show_error_dialog(self, "Critical error", val, tb)
 
 tk.Tk.report_callback_exception = tk_exception_handler
 
