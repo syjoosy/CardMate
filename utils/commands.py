@@ -11,7 +11,7 @@ def get_platform():
         return "linux"
     elif sys.platform.startswith("win"):
         return "windows"
-    return "unknown"
+    raise Exception("Unknown OS! Cant get platform!")
 
 # =========================
 # FILESYSTEMS
@@ -29,7 +29,7 @@ def get_filesystems():
         return _fs_windows()
 
     else:
-        return []
+        raise Exception("Unknown OS! Cant get filesystems list!")
 
 def _fs_macos():
     return [
@@ -72,7 +72,7 @@ def get_disk_list():
         raise NotImplementedError("Windows get disk not implemented yet")
 
     else:
-        return []
+        raise Exception("Unknown OS! Cant get disk list!")
 
 # =========================
 # UNMOUNT DISK
@@ -91,7 +91,7 @@ def unmount_disk(disk):
         raise NotImplementedError("Unmount not implemented for Windows")
 
     else:
-        raise Exception("Unsupported OS")
+        raise Exception("Unknown OS! Cant unmount disk!")
 
 
 # =========================
@@ -110,7 +110,7 @@ def flash_disk(image, target):
         raise NotImplementedError("Flash not implemented for Windows")
 
     else:
-        raise Exception("Unsupported OS")
+        raise Exception("Unknown OS! Cant flash disk!")
 
 
 def _flash_macos(image, target):
@@ -148,7 +148,7 @@ def format_disk(disk, filesystem, volume_name):
         raise NotImplementedError("Windows format not implemented yet")
 
     else:
-        raise Exception("Unsupported OS")
+        raise Exception("Unknown OS! Cant format disk!")
 
 
 def _format_macos(disk, filesystem, volume_name):
@@ -177,7 +177,7 @@ def create_backup(source, destination):
         raise NotImplementedError("Windows backup not implemented yet")
 
     else:
-        raise Exception("Unsupported OS")
+        raise Exception("Unknown OS! Cant create backup!")
 
 
 def _backup_macos(source, destination):

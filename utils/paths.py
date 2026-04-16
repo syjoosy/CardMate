@@ -1,6 +1,5 @@
 import os
 
-
 def get_default_paths():
     home = os.path.expanduser("~")
 
