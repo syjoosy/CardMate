@@ -21,7 +21,7 @@ pyinstaller --name="CardMate" --onefile --windowed --icon=icons/icon.icns main.p
 ## Windows:
 
 ```
-pyinstaller --onefile --windowed --icon=icons/icon.ico main.py
+pyinstaller --name="CardMate" --onefile --windowed --icon=icons/icon.ico main.py
 ```
 
 # Run:

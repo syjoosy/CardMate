@@ -20,7 +20,7 @@ logging.addLevelName(SUCCESS_LEVEL_NUM, SUCCESS)
 
 MAC_OS_LOG_PATH = "~/Library/Logs/CardMate/"
 LINUX_LOG_PATH = "/var/log/CardMate/"
-WINDOWS_LOG_PATH = "~/Library/Logs/CardMate/"
+WINDOWS_LOG_PATH = "%LOCALAPPDATA%\\CardMate\\Logs\\"
 
 if sys.platform == "darwin":
     LOG_DIR = os.path.expanduser(MAC_OS_LOG_PATH)
