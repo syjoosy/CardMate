@@ -3,7 +3,7 @@ name: Update version file
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, release ]
     paths-ignore:
       - '**/version.py'  # избегаем циклов
 
@@ -25,6 +25,7 @@ jobs:
         echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
         echo "full=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
         echo "describe=$(git describe --tags --always --dirty)" >> $GITHUB_OUTPUT
+        echo "branch=$('git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
     
     - name: Generate version.py
       run: |
@@ -33,6 +34,7 @@ jobs:
         GIT_COMMIT_SHORT = "${{ steps.commit.outputs.short }}"
         GIT_COMMIT_FULL = "${{ steps.commit.outputs.full }}"
         GIT_DESCRIBE = "${{ steps.commit.outputs.describe }}"
+        GIT_BRANCH = "${{ steps.commit.outputs.branch }}"
         EOF
     
     - name: Commit and push if changed
