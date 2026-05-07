@@ -52,15 +52,6 @@ def get_disk_list():
     else:
         raise Exception("Unknown OS! Cant get disk list!")
 
-
-# def _get_windows_disks():
-#     # Используем PowerShell
-#     return [
-#         "powershell",
-#         "-Command",
-#         "Get-Disk | Select-Object Number, FriendlyName, Size"
-#     ]
-
 # =========================
 # UNMOUNT DISK
 # =========================

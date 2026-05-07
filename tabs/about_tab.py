@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import webbrowser
-from const import VERSION
+from const import FULL_VERSION
 from utils.logging import log_message, INFO
 
 GITHUB_URL = "https://github.com/syjoosy/CardMate"
@@ -32,7 +32,7 @@ class AboutTab:
         # Version
         version_label = ctk.CTkLabel(
             container,
-            text=f"Version: {VERSION}"
+            text=f"Version: {FULL_VERSION}"
         )
         version_label.pack(pady=2)
 
