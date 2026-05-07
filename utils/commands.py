@@ -1,5 +1,5 @@
 import sys
-from utils.disks import _get_macos_disks, _get_linux_disks
+from utils.disks import _get_macos_disks, _get_linux_disks, _get_windows_disks
 
 # =========================
 # OS DETECTION
@@ -53,13 +53,13 @@ def get_disk_list():
         raise Exception("Unknown OS! Cant get disk list!")
 
 
-def _get_windows_disks():
-    # Используем PowerShell
-    return [
-        "powershell",
-        "-Command",
-        "Get-Disk | Select-Object Number, FriendlyName, Size"
-    ]
+# def _get_windows_disks():
+#     # Используем PowerShell
+#     return [
+#         "powershell",
+#         "-Command",
+#         "Get-Disk | Select-Object Number, FriendlyName, Size"
+#     ]
 
 # =========================
 # UNMOUNT DISK

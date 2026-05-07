@@ -158,8 +158,10 @@ class FlashTab:
     def refresh_disks(self):
         log_message(INFO, "Start refresh disks!")
         disks = get_disk_list()
-        log_message(INFO, "Disks: " + str(disks))
-        self.device_map = {name: path for name, path in disks}
+        log_message(INFO, "Disk command: " + str(disks))
+        
+        if disks:
+            self.device_map = {name: path for name, path in disks}
 
         self.dest_combo.configure(values=list(self.device_map.keys()))
 
