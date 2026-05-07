@@ -23,6 +23,7 @@ class FlashTab:
         self.refresh_disks()
 
     def build_ui(self):
+        log_message(INFO, "Start build ui!")
         self.title_label = ctk.CTkLabel(
             self.parent,
             text="Flash image to disk",
@@ -123,6 +124,8 @@ class FlashTab:
             "DEBUG": "gray",
         }.items():
             self.log_text.tag_config(tag, foreground=color)
+        
+        log_message(INFO, "Finish build ui!")
 
     # =========================
     # FILE PICKER
@@ -153,7 +156,9 @@ class FlashTab:
     # DISKS
     # =========================
     def refresh_disks(self):
+        log_message(INFO, "Start refresh disks!")
         disks = get_disk_list()
+        log_message(INFO, "Disks: " + str(disks))
         self.device_map = {name: path for name, path in disks}
 
         self.dest_combo.configure(values=list(self.device_map.keys()))
