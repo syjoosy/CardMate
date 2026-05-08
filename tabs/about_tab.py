@@ -2,7 +2,7 @@ import customtkinter as ctk
 import webbrowser
 from const import FULL_VERSION
 from utils.logging import log_message, INFO
-from version import GIT_COMMIT_SHORT
+from version import GIT_COMMIT_SHORT, GIT_BRANCH
 
 GITHUB_URL = "https://github.com/syjoosy/CardMate"
 
@@ -33,7 +33,7 @@ class AboutTab:
         # Version
         version_label = ctk.CTkLabel(
             container,
-            text=f"Version: {FULL_VERSION} [{GIT_COMMIT_SHORT}]"
+            text=f"Version: {FULL_VERSION} [{GIT_BRANCH}] [{GIT_COMMIT_SHORT}]"
         )
         version_label.pack(pady=2)
 

@@ -1,3 +1,2 @@
 VERSION = "1.0.0"
-BUILD = "[Dev Build]"
-FULL_VERSION = f"v{VERSION} {BUILD}"
+FULL_VERSION = f"v{VERSION}"
