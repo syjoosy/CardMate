@@ -86,7 +86,7 @@ class SettingsTab:
         log_message(INFO, "Generate Settings Tab!")
 
         files_count = get_files_count()
-        if files_count % 20 == 0:
+        if files_count % 20 == 0 and files_count != 0:
             show_dialog(parent, "Info", "Enjoying CardMate? \nRate it on GitHub!⭐", buttons=[("Rate", on_rate), ("Skip", on_skip)])
 
         row_frame = ctk.CTkFrame(parent)
