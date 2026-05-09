@@ -6,6 +6,7 @@ import customtkinter as ctk
 from utils.logging import log_message, INFO
 from utils.commands import get_platform
 from utils.logging import MAC_OS_LOG_PATH, LINUX_LOG_PATH, WINDOWS_LOG_PATH
+from ui.dialog import show_dialog
 
 def get_logs_path():
     platform = get_platform()
@@ -19,10 +20,20 @@ def get_logs_path():
     else:
         raise Exception("Unsupported OS. Cant get log path!")
 
-def get_files_count():
+def get_files_count(self):
     path = get_logs_path()
     files_count: int = 0
-    # files_count += 1
+
+    if os.path.exists(path):
+        for root, _, files in os.walk(path):
+            for file in files:
+                files_count += 1
+    
+
+    if files_count % 1 == 0:
+        show_dialog(self, "Info", "If you like this app, \nrate it on github <3")
+
+    
 
 def get_logs_size():
     path = get_logs_path()
@@ -69,6 +80,8 @@ def open_folder(path: str):
 class SettingsTab:
     def __init__(self, parent):
         log_message(INFO, "Generate Settings Tab!")
+
+        get_files_count(parent)
 
         row_frame = ctk.CTkFrame(parent)
         row_frame.pack(pady=10, fill="x")
