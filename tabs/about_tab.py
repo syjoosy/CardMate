@@ -6,6 +6,9 @@ from version import GIT_COMMIT_SHORT, GIT_BRANCH
 
 GITHUB_URL = "https://github.com/syjoosy/CardMate"
 
+def open_github():
+    webbrowser.open(GITHUB_URL)
+
 class AboutTab:
     def __init__(self, parent):
         log_message(INFO, "Generate About Tab!")
@@ -45,7 +48,7 @@ class AboutTab:
         github_button = ctk.CTkButton(
             container,
             text="View on GitHub",
-            command=self.open_github
+            command=open_github
         )
         github_button.pack(pady=2)
 
@@ -62,6 +65,3 @@ class AboutTab:
             text="Made by Vadim 'syjoosy' Nikolaev in 2026"
         )
         author_label.pack(pady=1)
-
-    def open_github(self):
-        webbrowser.open(GITHUB_URL)

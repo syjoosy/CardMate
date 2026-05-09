@@ -7,6 +7,7 @@ from utils.logging import log_message, INFO
 from utils.commands import get_platform
 from utils.logging import MAC_OS_LOG_PATH, LINUX_LOG_PATH, WINDOWS_LOG_PATH
 from ui.dialog import show_dialog
+from tabs.about_tab import open_github
 
 def get_logs_path():
     platform = get_platform()
@@ -20,7 +21,7 @@ def get_logs_path():
     else:
         raise Exception("Unsupported OS. Cant get log path!")
 
-def get_files_count(self):
+def get_files_count():
     path = get_logs_path()
     files_count: int = 0
 
@@ -29,9 +30,7 @@ def get_files_count(self):
             for file in files:
                 files_count += 1
     
-
-    if files_count % 1 == 0:
-        show_dialog(self, "Info", "If you like this app, \nrate it on github <3")
+    return files_count
 
     
 
@@ -76,12 +75,19 @@ def open_folder(path: str):
     else:
         raise Exception("Unsupported OS. Cant open folder!")
 
+def on_rate():
+    open_github()
+
+def on_skip():
+    pass
 
 class SettingsTab:
     def __init__(self, parent):
         log_message(INFO, "Generate Settings Tab!")
 
-        get_files_count(parent)
+        files_count = get_files_count()
+        if files_count % 20 == 0:
+            show_dialog(parent, "Info", "Enjoying CardMate? \nRate it on GitHub!⭐", buttons=[("Rate", on_rate), ("Skip", on_skip)])
 
         row_frame = ctk.CTkFrame(parent)
         row_frame.pack(pady=10, fill="x")
