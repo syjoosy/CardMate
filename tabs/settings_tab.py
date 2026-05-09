@@ -19,6 +19,11 @@ def get_logs_path():
     else:
         raise Exception("Unsupported OS. Cant get log path!")
 
+def get_files_count():
+    path = get_logs_path()
+    files_count: int = 0
+    # files_count += 1
+
 def get_logs_size():
     path = get_logs_path()
     total_size = 0
@@ -26,6 +31,7 @@ def get_logs_size():
     if os.path.exists(path):
         for root, _, files in os.walk(path):
             for file in files:
+                
                 if file.startswith("cardMate"):
                     file_path = os.path.join(root, file)
                     try:
