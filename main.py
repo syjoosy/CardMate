@@ -10,6 +10,9 @@ from tabs.about_tab import AboutTab
 # Импорт логирования
 from utils.logging import log_message, INFO, SUCCESS
 
+from version import GIT_COMMIT_SHORT, GIT_BRANCH
+from const import FULL_VERSION
+
 # Глобальные настройки внешнего вида
 ctk.set_appearance_mode("Dark")       # Тема (Dark / Light / System)
 ctk.set_default_color_theme("blue")  # Цвет акцентов
@@ -138,6 +141,7 @@ class CardMateApp(ctk.CTk):
 if __name__ == "__main__":
     # Лог при старте приложения
     log_message(INFO, "App started!")
+    log_message(INFO,f"Version: {FULL_VERSION} [{GIT_BRANCH}] [{GIT_COMMIT_SHORT}]")
 
     # Создание и запуск приложения
     app = CardMateApp()
