@@ -1,0 +1,19 @@
+# First Release of CardMate 🎉
+
+CardMate is a cross-platform GUI application designed to make working with SD cards easier.
+
+With CardMate, you can:
+
+* **Format disks** using different filesystems:
+
+  * **macOS:** APFS, JHFS+, ExFAT, FAT32
+  * **Linux:** ext4, ext3, ext2, vfat, NTFS, exFAT
+  * **Windows:** NTFS, exFAT, FAT32
+*  **Back up disks** to `.img` files
+*  **Flash `.img` files** back to disks
+
+This is the **first release of CardMate**, providing the core functionality for formatting, backing up, and flashing SD cards across platforms.
+
+More features and improvements are planned for future releases.
+
+
