@@ -3,7 +3,7 @@ name: Update version file
 
 on:
   push:
-    branches: [ main, release ]
+    branches: [ main, release/0.1.0 ]
     paths-ignore:
       - '**/version.py'  # избегаем циклов
 
