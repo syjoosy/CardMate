@@ -27,7 +27,7 @@ class AboutTab:
         # Extended description
         description = ctk.CTkLabel(
             container,
-            text="A utility program for flashing, formatting, and backing up SD cards.",
+            text="A cross-platform GUI application that will help you work with flashing and backup sd cards",
             wraplength=300,
             justify="center"
         )
