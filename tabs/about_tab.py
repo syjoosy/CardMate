@@ -42,7 +42,7 @@ class AboutTab:
 
         # Spacer
         spacer = ctk.CTkFrame(container, fg_color="transparent")
-        spacer.pack(expand=True, fill="both", pady=20)
+        spacer.pack(expand=True, fill="both", pady=10)
 
         # GitHub button
         github_button = ctk.CTkButton(
@@ -51,6 +51,14 @@ class AboutTab:
             command=open_github
         )
         github_button.pack(pady=2)
+
+        # GitHub button
+        report_button = ctk.CTkButton(
+            container,
+            text="Report bug",
+            command=open_github
+        )
+        report_button.pack(pady=2)
 
         # License
         license_label = ctk.CTkLabel(
