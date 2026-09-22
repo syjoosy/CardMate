@@ -5,9 +5,13 @@ from utils.logging import log_message, INFO
 from version import GIT_COMMIT_SHORT, GIT_BRANCH
 
 GITHUB_URL = "https://github.com/syjoosy/CardMate"
+REPORT_BUG_URL = "https://github.com/syjoosy/CardMate/issues"
 
 def open_github():
     webbrowser.open(GITHUB_URL)
+
+def open_report_bug():
+    webbrowser.open(REPORT_BUG_URL)
 
 class AboutTab:
     def __init__(self, parent):
@@ -60,7 +64,7 @@ class AboutTab:
         report_button = ctk.CTkButton(
             buttons_frame,
             text="Report bug",
-            command=open_github
+            command=open_report_bug
         )
         report_button.pack(side="left", padx=5)
 
